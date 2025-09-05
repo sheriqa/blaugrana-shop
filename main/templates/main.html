@@ -1,0 +1,15 @@
+<h1>{{ shop_name }}</h1>
+<p>Owner: {{ owner }} ({{ class }})</p>
+
+<h2>Daftar Produk</h2>
+<ul>
+  {% for product in products %}
+    <li>
+      <strong>{{ product.name }}</strong> - Rp {{ product.price }} <br>
+      {{ product.description }} <br>
+      <img src="{{ product.thumbnail }}" width="150">
+    </li>
+  {% empty %}
+    <p>Belum ada produk.</p>
+  {% endfor %}
+</ul>
