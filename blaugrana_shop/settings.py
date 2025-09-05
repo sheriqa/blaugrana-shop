@@ -33,6 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "a-sheriqa-blaugranashop.pbp.cs.ui.ac.id"]
 
 # Application definition
+#test
 
 INSTALLED_APPS = [
     'django.contrib.admin',
