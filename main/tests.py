@@ -34,6 +34,5 @@ class MainTest(TestCase):
             description="Kaus untuk latihan",
             thumbnail="https://example.com/kaus.jpg",
             category="training",
-            # is_featured sengaja nggak dikasih → default False
         )
         self.assertFalse(product.is_featured)
