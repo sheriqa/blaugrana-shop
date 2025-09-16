@@ -16,25 +16,13 @@ class Product(models.Model):
     description = models.TextField()
     price = models.PositiveIntegerField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='others')
-    thumbnail = models.URLField(blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} - Rp{self.price}"
-
-    @property
-    def is_available(self):
-        """Cek apakah produk masih ada stoknya"""
-        return self.stock > 0
-
-    def reduce_stock(self, qty=1):
-        """Kurangi stok produk ketika dibeli"""
-        if self.stock >= qty:
-            self.stock -= qty
-            self.save()
-
 
 class CartItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -49,3 +37,5 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         return self.product.price * self.quantity
+    
+

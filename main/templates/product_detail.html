@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 500px; margin: 30px auto; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background-color: #fff; font-family: Arial, sans-serif;">
+
+    <!-- Gambar Produk -->
+    {% if product.thumbnail %}
+      <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}" style="width:100%; height:auto; border-radius:12px; margin-bottom:15px;">
+    {% else %}
+      <p style="color:#888; font-style:italic;">Image not available</p>
+    {% endif %}
+  
+    <!-- Nama Produk -->
+    <h1 style="color:#FF69B4; font-size:28px; margin-bottom:10px;">{{ product.name }}</h1>
+  
+    <!-- Harga -->
+    <p style="font-size:18px; font-weight:bold; margin:8px 0;">
+      Harga: <span style="color:#2E8B57;">Rp{{ product.price }}</span>
+    </p>
+  
+    <!-- Deskripsi -->
+    <p style="font-size:16px; color:#555; margin:8px 0;">
+      {{ product.description }}
+    </p>
+  
+    <!-- Tombol Kembali -->
+    <a href="{% url 'main:show_main' %}" 
+       style="display:inline-block; padding:10px 20px; border-radius:8px; background-color:#FF69B4; color:white; text-decoration:none; font-weight:bold; transition:background-color 0.3s;">
+       ← Back to Prev Page
+    </a>
+  </div>
+  {% endblock %}
