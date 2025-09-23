@@ -10,7 +10,6 @@ class Product(models.Model):
         ('ball', 'Ball'),
         ('others', 'Others'),
     ]
-    #tes
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=200)
