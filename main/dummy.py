@@ -1,7 +1,6 @@
 from main.models import Product
 from django.contrib.auth.models import User
 
-Product.objects.all().delete()
 
 user1, created = User.objects.get_or_create(username='user1')
 if created:
