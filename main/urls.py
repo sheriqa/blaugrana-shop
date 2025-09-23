@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-
 app_name = 'main'
 
 urlpatterns = [
@@ -13,6 +12,9 @@ urlpatterns = [
     path('json/<uuid:id>/', views.show_json_by_id, name='show_json_by_id'),
     path('products/detail/<uuid:id>/', views.product_detail, name="product_detail"),
     path('products/create/', views.create_product, name="create_product"),
+    path('register/', views.register, name='register'),
+    path('login/', views.login_user, name='login'),
+    path('logout/', views.logout_user, name='logout'),
 ]
 
 if settings.DEBUG:

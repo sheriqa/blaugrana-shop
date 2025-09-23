@@ -16,6 +16,24 @@
     </a>
   </div>
 
+  <!-- logout -->
+  <div style="text-align:center; margin-bottom:30px;">
+    <a href="{% url 'main:logout' %}" 
+       style="display:inline-block; padding:10px 22px; border-radius:8px; background-color:#FF69B4; color:white; text-decoration:none; font-weight:bold; transition:0.3s;">
+       Logout
+    </a>
+  </div>
+
+  <div style="margin-top:15px; display:inline-block; padding:10px 18px; background:#f3e5f5; border:1px solid #ce93d8; border-radius:8px; color:#4a148c; font-size:14px;">
+    <strong>Logged in as:</strong> {{ username }}
+</div>
+
+
+  <div style="margin-top:15px; display:inline-block; padding:10px 18px; background:#fce4ec; border:1px solid #f8bbd0; border-radius:8px; color:#880e4f; font-size:14px;">
+      <strong>Sesi terakhir login:</strong><br> {{ last_login }}
+    </div>
+  </div>
+
   <!-- Daftar Produk -->
   <h2 style="color:#333; margin-bottom:15px;">Product List</h2>
   <ul style="list-style:none; padding:0; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
