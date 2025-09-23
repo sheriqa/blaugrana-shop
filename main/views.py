@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse #tugas3
 from django.core import serializers #tugas3
 from .models import Product
-from .form import ProductForm
+from .forms import ProductForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm #Tugas 4
 from django.contrib import messages 
 from django.contrib.auth import authenticate, login, logout 
