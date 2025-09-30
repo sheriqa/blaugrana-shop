@@ -10,12 +10,14 @@ urlpatterns = [
     path('json/', views.show_json, name='show_json'),
     path('xml/<uuid:id>/', views.show_xml_by_id, name='show_xml_by_id'),
     path('json/<uuid:id>/', views.show_json_by_id, name='show_json_by_id'),
-    path('products/detail/<uuid:id>/', views.product_detail, name="product_detail"),
+    path('product/detail/<uuid:pk>/', views.product_detail, name="product_detail"),
     path('products/create/', views.create_product, name="create_product"),
     path('register/', views.register, name='register'),
     path('login/', views.login_user, name='login'),
     path('logout/', views.logout_user, name='logout'),
+    path('product/<uuid:id>/edit', views.edit_product, name='edit_product'),
+    path('product/<uuid:id>/delete', views.delete_product, name='delete_product'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

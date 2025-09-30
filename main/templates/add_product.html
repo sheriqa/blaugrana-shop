@@ -1,22 +1,21 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div style="max-width: 500px; margin: 40px auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background-color: #fff; font-family: Arial, sans-serif;">
+<div class="max-w-md mx-auto my-10 p-8 rounded-2xl shadow-lg bg-white font-sans">
+    <h1 class="text-center text-2xl font-bold text-Gold mb-6">Add Product</h1>
 
-    <h1 style="text-align:center; color:#FF69B4; margin-bottom: 25px;">Add Product</h1>
-
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
-        <div style="display:flex; flex-direction:column; gap:15px;">
-            {{ form.as_p }}
-        </div>
-        <button type="submit" style="margin-top:20px; width:100%; padding:12px; background-color:#2E8B57; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; transition:0.3s;">
+        {{ form.as_p }}
+        <button type="submit" 
+                class="w-full py-3 bg-Blue text-white font-semibold rounded-lg hover:bg-Red transition">
             Save Product
         </button>
     </form>
 
-    <a href="{% url 'main:show_main' %}" style="display:block; text-align:center; margin-top:20px; color:#FF69B4; text-decoration:none; font-weight:bold;">
+    <a href="{% url 'main:show_main' %}" 
+       class="block text-center mt-6 text-Red font-semibold hover:underline">
         ← Back to Prev Page
     </a>
-
 </div>
 {% endblock %}

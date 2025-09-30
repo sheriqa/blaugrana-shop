@@ -1,71 +1,91 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div style="max-width: 800px; margin: 30px auto; font-family: Arial, sans-serif;">
+
+<div class="max-w-6xl mx-auto px-4 py-8 font-sans">
 
   <!-- Header Toko -->
-  <div style="text-align:center; margin-bottom:30px;">
-    <h1 style="color:#FF69B4; font-size:32px; margin-bottom:5px;">{{ shop_name }}</h1>
-    <p style="font-size:16px; color:#555;">Owner: {{ owner }} ({{ class }})</p>
+  <div class="text-center mb-10">
+    <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#A50044] via-[#004D98] to-[#800033] drop-shadow-lg mb-2">
+      {{ shop_name }}
+    </h1>
+    <p class="text-gray-700 text-sm">
+      Owner: <span class="font-semibold">{{ owner }}</span> | Class: {{ class }}
+    </p>
   </div>
 
-  <!-- Tombol Add Product -->
-  <div style="text-align:center; margin-bottom:30px;">
+  <!-- Tombol Filter + Add Product + Back -->
+  <div class="flex flex-wrap justify-center gap-4 mb-10">
+    <a href="?filter=all" 
+       class="px-4 py-2 rounded-lg {% if filter_type == 'all' %}bg-[#003366]{% else %}bg-[#004D98]{% endif %} text-white font-semibold hover:bg-[#003366] transition">
+      All Products
+    </a>
+    <a href="?filter=my" 
+       class="px-4 py-2 rounded-lg {% if filter_type == 'my' %}bg-[#DAA520]{% else %}bg-[#EDBB00]{% endif %} text-[#004D98] font-semibold hover:bg-[#DAA520] transition">
+      My Products
+    </a>
     <a href="{% url 'main:create_product' %}" 
-       style="display:inline-block; padding:12px 25px; border-radius:8px; background-color:#2E8B57; color:white; text-decoration:none; font-weight:bold; transition:0.3s;">
-       + Add Product
+       class="px-4 py-2 rounded-lg bg-[#EDBB00] text-[#004D98] font-semibold hover:bg-[#DAA520] transition">
+      + Add Product
     </a>
-  </div>
-
-  <!-- logout -->
-  <div style="text-align:center; margin-bottom:30px;">
-    <a href="{% url 'main:logout' %}" 
-       style="display:inline-block; padding:10px 22px; border-radius:8px; background-color:#FF69B4; color:white; text-decoration:none; font-weight:bold; transition:0.3s;">
-       Logout
+    {% if filter_type == 'my' %}
+    <a href="{% url 'main:show_main' %}" 
+       class="px-4 py-2 rounded-lg bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 transition">
+       Back to Prev
     </a>
-  </div>
-
-  <div style="margin-top:15px; display:inline-block; padding:10px 18px; background:#f3e5f5; border:1px solid #ce93d8; border-radius:8px; color:#4a148c; font-size:14px;">
-    <strong>Logged in as:</strong> {{ username }}
-</div>
-
-
-  <div style="margin-top:15px; display:inline-block; padding:10px 18px; background:#fce4ec; border:1px solid #f8bbd0; border-radius:8px; color:#880e4f; font-size:14px;">
-      <strong>Sesi terakhir login:</strong><br> {{ last_login }}
-    </div>
+    {% endif %}
   </div>
 
   <!-- Daftar Produk -->
-  <h2 style="color:#333; margin-bottom:15px;">Product List</h2>
-  <ul style="list-style:none; padding:0; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
+  {% if products %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for product in products %}
-      <li style="background-color:#fff; padding:15px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+      <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition flex flex-col overflow-hidden">
         
-        <!-- Thumbnail -->
         {% if product.thumbnail %}
-          <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}" style="width:100%; height:auto; border-radius:12px; margin-bottom:10px;">
+          <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}" class="w-full h-44 object-cover">
         {% else %}
-          <div style="width:100%; height:150px; background-color:#eee; display:flex; align-items:center; justify-content:center; border-radius:12px; margin-bottom:10px;">
-            <span style="color:#888; font-style:italic;">No Image</span>
+          <div class="w-full h-44 bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-400 italic">No Image</span>
           </div>
         {% endif %}
 
-        <!-- Nama & Harga -->
-        <p style="font-weight:bold; font-size:18px; margin:5px 0;">{{ product.name }}</p>
-        <p style="color:#2E8B57; font-weight:bold; margin:5px 0;">Rp {{ product.price }}</p>
+        <div class="p-4 flex flex-col flex-grow">
+          <h3 class="text-lg font-bold text-gray-800 mb-1">{{ product.name }}</h3>
+          <p class="text-[#DAA520] font-semibold mb-2">Rp {{ product.price }}</p>
+          <p class="text-gray-600 text-sm flex-grow">{{ product.description }}</p>
 
-        <!-- Deskripsi -->
-        <p style="color:#555; font-size:14px; margin:5px 0;">{{ product.description }}</p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="{% url 'main:product_detail' product.id %}" 
+               class="inline-block text-center px-3 py-2 bg-[#004D98] text-white rounded-lg font-semibold hover:bg-[#003366] transition">
+               Detail
+            </a>
 
-        <!-- Tombol Detail -->
-        <a href="{% url 'main:product_detail' product.id %}" 
-           style="display:inline-block; margin-top:10px; padding:8px 15px; border-radius:8px; background-color:#FF69B4; color:white; text-decoration:none; font-weight:bold;">
-           Detail
-        </a>
-      </li>
-    {% empty %}
-      <p style="color:#888; font-style:italic;">Belum ada produk.</p>
+            {% if filter_type == 'my' %}
+            <a href="{% url 'main:edit_product' product.id %}" 
+               class="inline-block text-center px-3 py-2 bg-[#EDBB00] text-[#004D98] rounded-lg font-semibold hover:bg-[#DAA520] transition">
+               Edit
+            </a>
+            <a href="{% url 'main:delete_product' product.id %}" 
+               class="inline-block text-center px-3 py-2 bg-[#A50044] text-white rounded-lg font-semibold hover:bg-[#800033] transition"
+               onclick="return confirm('Yakin mau hapus produk ini?');">
+               Delete
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-lg p-8 text-center shadow-md">
+    <img src="{% static 'image/no_product.png' %}" alt="Belum ada produk" class="w-28 mx-auto mb-4">
+    <p class="text-gray-600 mb-4">Belum ada produk. Yuk tambahkan produk pertamamu!</p>
+    <a href="{% url 'main:create_product' %}" class="inline-block px-4 py-2 bg-[#A50044] text-white rounded-lg font-semibold hover:bg-[#800033] transition">
+      Tambah Product
+    </a>
+  </div>
+  {% endif %}
 
 </div>
 {% endblock %}

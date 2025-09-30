@@ -1,91 +1,46 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block meta %}
 <title>Login</title>
-<style>
-  .login-container {
-    max-width: 420px;
-    margin: 60px auto;
-    padding: 25px 35px;
-    border: 2px solid #c8e6c9;
-    border-radius: 12px;
-    background: #fce4ec;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-    font-family: Arial, sans-serif;
-  }
-
-  .login-container h1 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #2e7d32;
-  }
-
-  .login-container table {
-    width: 100%;
-  }
-
-  .login-container input[type="submit"] {
-    background: #ec407a;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-
-  .login-container input[type="submit"]:hover {
-    background: #ad1457;
-  }
-
-  .messages {
-    margin-top: 18px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: #c8e6c9;
-    color: #1b5e20;
-    list-style: none;
-  }
-
-  .register-link {
-    display: block;
-    margin-top: 20px;
-    text-align: center;
-    color: #c2185b;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .register-link:hover {
-    text-decoration: underline;
-    color: #880e4f;
-  }
-</style>
 {% endblock meta %}
 
 {% block content %}
-<div class="login-container">
-  <h1>Login</h1>
+<div class="max-w-md mx-auto mt-16 p-8 rounded-xl shadow-lg bg-white">
+  <!-- Judul -->
+  <h1 class="text-3xl font-bold text-center text-blue mb-6">Login</h1>
 
-  <form method="POST" action="">
+  <!-- Form Login -->
+  <form method="POST" action="" class="space-y-4">
     {% csrf_token %}
-    <table>
-      {{ form.as_table }}
-      <tr>
-        <td></td>
-        <td><input class="btn login_btn" type="submit" value="Login" /></td>
-      </tr>
-    </table>
+
+    <!-- Input Form -->
+    <div class="space-y-4">
+      {{ form.as_p }}
+    </div>
+
+    <!-- Tombol Login -->
+    <div>
+      <input type="submit" value="Login"
+             class="w-full cursor-pointer px-4 py-2 rounded-lg bg-red text-white font-semibold hover:bg-gold hover:text-blue transition duration-300"/>
+    </div>
   </form>
 
+  <!-- Pesan Error / Info -->
   {% if messages %}
-  <ul class="messages">
+  <ul class="mt-6 p-3 rounded-lg bg-gold text-blue font-medium space-y-1">
     {% for message in messages %}
     <li>{{ message }}</li>
     {% endfor %}
   </ul>
   {% endif %}
 
-  <a class="register-link" href="{% url 'main:register' %}">Don’t have an account? Register Now</a>
+  <!-- Link Register -->
+  <div class="mt-6 text-center">
+    <a href="{% url 'main:register' %}" 
+       class="font-bold text-blue hover:text-red transition duration-300">
+       Don’t have an account? Register Now
+    </a>
+  </div>
 </div>
 {% endblock content %}

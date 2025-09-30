@@ -17,7 +17,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.PositiveIntegerField()
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='others')
-    thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
+    thumbnail = models.URLField(blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -39,4 +39,3 @@ class CartItem(models.Model):
     def total_price(self):
         return self.product.price * self.quantity
     
-

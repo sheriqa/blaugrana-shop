@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse #tugas3
 from django.core import serializers #tugas3
 from .models import Product
-from .forms import ProductForm
+from .forms import ProductForm, RegisterForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm #Tugas 4
 from django.contrib import messages 
 from django.contrib.auth import authenticate, login, logout 
@@ -14,16 +14,43 @@ from django.contrib.auth.decorators import login_required #tugas 4
 
 @login_required(login_url='/login')
 def show_main(request):
+    filter_type = request.GET.get("filter", "all")  # ambil query param
+    category = request.GET.get("category", None)    
+
+    # Filter produk
+    if filter_type == "all":
+        products = Product.objects.all()
+    elif filter_type == "my":
+        products = Product.objects.filter(user=request.user)
+    else:
+        products = Product.objects.filter(user=request.user)
+
+    if category:
+        products = products.filter(category=category)  
+
+    # Menu kategori untuk navbar
+    menu_items = [
+        {'name': 'Jersey', 'slug': 'jersey'},
+        {'name': 'Shoes', 'slug': 'shoes'},
+        {'name': 'Accessories', 'slug': 'accessories'},
+        {'name': 'Ball', 'slug': 'ball'},
+        {'name': 'Others', 'slug': 'others'},
+    ]
+
     context = {
         'shop_name': 'Blaugrana Shop',
         'owner': 'A. Sheriqa Dewina Ihsan [2406360722]',
         'class': 'PBP B',
-        'products': Product.objects.all(),
+        'products': products,
+        'menu_items': menu_items,
+        'filter_type': filter_type,  # <-- penting untuk template
         'last_login': request.COOKIES.get('last_login'),
     }
     return render(request, "main.html", context)
 
-#tugas3 -- Serialisasi
+
+
+#======Tugas 3=======
 
 def show_xml(request):
     data = Product.objects.all()
@@ -41,10 +68,11 @@ def show_json_by_id(request, id):
     data = Product.objects.filter(pk=id)
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
-#tombol add dn detail
+    #tombol add dn detail
 
-def product_detail(request, id):
-    product = get_object_or_404(Product, pk=id)
+@login_required(login_url='/login')
+def product_detail(request, pk):
+    product = get_object_or_404(Product, pk=pk)
     return render(request, "product_detail.html", {"product": product})
 
 def create_product(request):
@@ -59,15 +87,15 @@ def create_product(request):
 
 #======Tugas 4=======
 def register(request):
-    form = UserCreationForm()
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Your account has been successfully created!')
-            return redirect('main:login')
-    context = {'form':form}
-    return render(request, 'register.html', context)
+            user = form.save()
+            login(request, user) 
+            return redirect("main:show_main")
+    else:
+        form = RegisterForm() 
+    return render(request, "register.html", {"form": form})
 def login_user(request):
    if request.method == 'POST':
       form = AuthenticationForm(data=request.POST)
@@ -86,3 +114,19 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+#======Tugas 5=======
+def edit_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    form = ProductForm(request.POST or None, instance=product)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+    context = {
+        'form': form
+    }
+    return render(request, "edit_product.html", context)
+def delete_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))

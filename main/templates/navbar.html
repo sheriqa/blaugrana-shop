@@ -1,0 +1,55 @@
+<nav class="bg-[#004D98] text-[#EDBB00] shadow-md px-6 py-4">
+  <div class="flex justify-between items-center">
+    <!-- Logo -->
+    <h1 class="text-2xl font-extrabold bg-gradient-to-r from-[#A50044] via-[#004D98] to-[#800033] bg-clip-text text-transparent">
+      Blaugrana Shop
+    </h1>
+
+    <!-- Hamburger (mobile) -->
+    <button id="menu-btn" class="md:hidden flex flex-col space-y-1">
+      <span class="block w-6 h-0.5 bg-[#EDBB00]"></span>
+      <span class="block w-6 h-0.5 bg-[#EDBB00]"></span>
+      <span class="block w-6 h-0.5 bg-[#EDBB00]"></span>
+    </button>
+
+    <!-- Menu desktop -->
+    <ul class="hidden md:flex space-x-3">
+      {% for item in menu_items %}
+      <li>
+        <a href="/?category={{ item.slug }}" class="px-3 py-1 rounded-md bg-[#A50044] text-white hover:bg-[#800033] transition">
+          {{ item.name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <!-- User info desktop -->
+    {% if user.is_authenticated %}
+    <div class="hidden md:flex flex-col items-end text-white">
+      <span class="font-semibold">Welcome, {{ user.username }}</span>
+      <a href="{% url 'main:logout' %}" class="text-white hover:underline mt-1">Logout</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="hidden mt-4 flex flex-col space-y-2 md:hidden">
+    {% for item in menu_items %}
+    <a href="/?category={{ item.slug }}" class="px-3 py-1 rounded-md bg-[#A50044] text-white hover:bg-[#800033] transition">
+      {{ item.name }}
+    </a>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+      <hr class="border-[#EDBB00]">
+      <span class="font-semibold text-white">Welcome, {{ user.username }}</span>
+      <a href="{% url 'main:logout' %}" class="text-white hover:underline mt-1">Logout</a>
+    {% endif %}
+  </div>
+</nav>
+
+<script>
+  const btn = document.getElementById("menu-btn");
+  const menu = document.getElementById("mobile-menu");
+  btn.addEventListener("click", () => menu.classList.toggle("hidden"));
+</script>
