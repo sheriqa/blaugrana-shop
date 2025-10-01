@@ -1,49 +1,58 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto my-10 font-sans">
+<div class="max-w-5xl mx-auto my-10 font-sans bg-gray-50 p-6 rounded-xl shadow-md">
 
-  <!-- Header -->
-  <div class="text-center mb-8">
-    <h1 class="text-3xl font-bold text-Blue mb-2">{{ product.name }}</h1>
-    <p class="text-gray-600 text-sm">Rp {{ product.price }}</p>
-  </div>
+  <div class="md:flex md:gap-8">
+    <!-- Gambar Produk -->
+    <div class="md:w-1/2 mb-6 md:mb-0">
+      {% if product.thumbnail %}
+        <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-auto rounded-xl object-cover shadow">
+      {% else %}
+        <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-xl shadow">
+          <span class="text-gray-400 italic">No Image</span>
+        </div>
+      {% endif %}
+    </div>
 
-  <!-- Gambar Produk -->
-  <div class="w-full mb-6">
-    {% if product.thumbnail %}
-      <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}" class="w-full rounded-xl object-cover">
-    {% else %}
-      <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-xl">
-        <span class="text-gray-400 italic">No Image</span>
+    <!-- Info Produk -->
+    <div class="md:w-1/2 flex flex-col justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-Blue mb-4 text-center mx-auto">{{ product.name }}</h1>
+        
+        <!-- Kotak Harga -->
+        <div class="bg-white rounded-xl shadow p-2 mb-4 text-center">
+          <h2 class="text-sm font-semibold text-Blue mb-1">Harga</h2>
+          <p class="text-lg font-bold text-Red">Rp {{ product.price }}</p>
+        </div>
+
+        <!-- Deskripsi -->
+        <div class="bg-white rounded-xl shadow p-4">
+          <h2 class="text-lg font-semibold text-Blue mb-2">Deskripsi</h2>
+          <p class="text-gray-700">{{ product.description }}</p>
+        </div>
       </div>
-    {% endif %}
-  </div>
 
-  <!-- Deskripsi Produk -->
-  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-    <h2 class="text-xl font-semibold text-Blue mb-3">Deskripsi</h2>
-    <p class="text-gray-700">{{ product.description }}</p>
-  </div>
+      <!-- Tombol Aksi -->
+      <div class="flex flex-wrap gap-4 mt-6 justify-center md:justify-start">
+        <a href="{% url 'main:show_main' %}" 
+           class="px-5 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-400 hover:text-gold transition">
+           Back to Prev
+        </a>
 
-  <!-- Tombol Aksi -->
-  <div class="flex flex-wrap gap-4 justify-center">
-    <a href="{% url 'main:show_main' %}" 
-       class="px-5 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-400 hover:text-white transition">
-       Back to Prev
-    </a>
-
-    {% if product.user == request.user %}
-    <a href="{% url 'main:edit_product' product.id %}" 
-       class="px-5 py-2 rounded-lg bg-Blue text-white font-semibold hover:bg-Gold hover:text-Blue transition">
-       Edit
-    </a>
-    <a href="{% url 'main:delete_product' product.id %}" 
-       class="px-5 py-2 rounded-lg bg-Red text-white font-semibold hover:bg-Gold hover:text-Blue transition"
-       onclick="return confirm('Yakin mau hapus produk ini?');">
-       Delete
-    </a>
-    {% endif %}
+        {% if product.user == request.user %}
+        <a href="{% url 'main:edit_product' product.id %}" 
+           class="px-5 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-400 hover:text-blue transition">
+           Edit
+        </a>
+        <a href="{% url 'main:delete_product' product.id %}" 
+           class="px-5 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-Blue-400 hover:text-red transition"
+           onclick="return confirm('Yakin mau hapus produk ini?');">
+           Delete
+        </a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

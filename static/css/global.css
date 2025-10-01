@@ -5,7 +5,7 @@ body {
     background-color: #f9fafb; /* bg-gray-50 */
     margin: 0;
     padding: 0;
-    color: #111827;
+    color: #d2daed;
 }
 
 /* FORM GLOBAL STYLE */
@@ -16,7 +16,7 @@ form select {
     padding: 0.6rem 0.8rem;
     border: 2px solid #004D98;  /* Biru */
     border-radius: 0.5rem;
-    background-color: #ffffff;
+    background-color: #5f2e2e;
     font-size: 0.95rem;
     transition: all 0.2s ease-in-out;
 }
@@ -35,7 +35,7 @@ input[type="checkbox"] {
     height: 1.25rem;
     border: 2px solid #EDBB00; /* Gold */
     border-radius: 0.375rem;
-    background-color: white;
+    background-color: rgb(111, 86, 86);
     cursor: pointer;
     position: relative;
     appearance: none;
@@ -108,7 +108,7 @@ a.btn-barca:hover {
 
 /* CARD STYLE (container form, detail produk, dll) */
 .card-barca {
-    background-color: #ffffff;
+    background-color: #a16868;
     border-radius: 0.75rem;
     padding: 2rem;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
@@ -121,7 +121,7 @@ a.btn-barca:hover {
     font-weight: 600;
     font-family: 'Poppins', sans-serif; 
     background-color: #A50044; /* Merah */
-    color: white;
+    color: rgb(92, 56, 56);
     border: 2px solid transparent;
     text-align: center;
     transition: all 0.3s ease;
