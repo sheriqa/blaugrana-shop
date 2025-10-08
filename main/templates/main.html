@@ -1,85 +1,279 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 <div class="max-w-6xl mx-auto px-4 py-8 font-sans">
 
-  <!-- Header Toko -->
-  <div class="text-center mb-10">
-    <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#A50044] via-[#004D98] to-[#800033] drop-shadow-lg mb-2">
-      {{ shop_name }}
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#A50044] via-[#004D98] to-[#800033] drop-shadow-lg mb-2">
+      {{ shop_name|default:"Blaugrana Shop" }}
     </h1>
     <p class="text-gray-700 text-sm">
-      Owner: <span class="font-semibold">{{ owner }}</span> | Class: {{ class }}
+      Owner: <span class="font-semibold">{{ owner }}</span> |
+      Class: {{ class }}
     </p>
   </div>
 
-  <!-- Tombol Filter + Add Product + Back -->
-  <div class="flex flex-wrap justify-center gap-4 mb-10">
-    <a href="?filter=all" 
-       class="px-4 py-2 rounded-lg {% if filter_type == 'all' %}bg-[#003366]{% else %}bg-[#004D98]{% endif %} text-white font-semibold hover:bg-[#003366] transition">
-      All Products
-    </a>
-    <a href="?filter=my" 
-       class="px-4 py-2 rounded-lg {% if filter_type == 'my' %}bg-[#DAA520]{% else %}bg-[#EDBB00]{% endif %} text-[#004D98] font-semibold hover:bg-[#DAA520] transition">
-      My Products
-    </a>
-    <a href="{% url 'main:create_product' %}" 
-       class="px-4 py-2 rounded-lg bg-[#EDBB00] text-[#004D98] font-semibold hover:bg-[#DAA520] transition">
-      + Add Product
-    </a>
+  <!-- Tombol Filter + Add Product + Refresh -->
+  <div class="flex flex-wrap justify-center gap-3 mb-8">
+    <button id="btnAll" class="px-4 py-2 rounded-lg bg-[#004D98] text-white font-semibold shadow-sm hover:bg-[#003b78] transition">All Products</button>
+    <button id="btnMy" class="px-4 py-2 rounded-lg text-[#004D98] font-semibold shadow-sm border border-[#004D98] hover:bg-[#004D98] hover:text-white transition">My Products</button>
+    <button id="btnAdd" class="px-4 py-2 rounded-lg font-semibold shadow-sm bg-[#EDBB00] text-[#004D98] hover:bg-[#DAA520]">+ Add Product</button>
+    <button id="btnRefresh" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition">🔄 Refresh</button>
   </div>
 
   <!-- Daftar Produk -->
-  {% if products %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for product in products %}
-      <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition flex flex-col overflow-hidden">
-        
-        {% if product.thumbnail %}
-          <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="w-full h-44 object-cover">
-        {% else %}
-          <div class="w-full h-44 bg-gray-200 flex items-center justify-center">
-            <span class="text-gray-400 italic">No Image</span>
-          </div>
-        {% endif %}
+  <div id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <p id="loadingState" class="col-span-full text-center text-gray-400">Loading products...</p>
+  </div>
+</div>
 
+<!-- Modal Tambah/Edit Produk -->
+<div id="productModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50">
+  <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-lg">
+    <h2 id="modalTitle" class="text-xl font-semibold mb-4">Tambah Produk</h2>
+    <form id="productForm" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" id="productId" name="id">
+
+      <div class="mb-3">
+        <label class="block text-gray-700 mb-1">Nama Produk</label>
+        <input type="text" id="productName" name="name" class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="block text-gray-700 mb-1">Harga</label>
+        <input type="number" id="productPrice" name="price" class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="block text-gray-700 mb-1">Deskripsi</label>
+        <textarea id="productDesc" name="description" rows="3" class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="block text-gray-700 mb-1">Thumbnail (URL opsional)</label>
+        <input type="url" id="productThumb" name="thumbnail" class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300">
+      </div>
+
+      <div class="mb-3">
+        <label class="block text-gray-700 mb-1">Kategori</label>
+        <select id="productCategory" name="category" class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300" required>
+          <option value="jersey">Jersey</option>
+          <option value="shoes">Shoes</option>
+          <option value="accessories">Accessories</option>
+          <option value="ball">Ball</option>
+          <option value="others">Others</option>
+        </select>
+      </div>
+
+      <div class="mb-3 flex items-center gap-2">
+        <input type="checkbox" id="productFeatured" name="is_featured">
+        <label for="productFeatured" class="text-gray-700">Featured Product</label>
+      </div>
+
+      <div class="flex justify-end space-x-2 mt-4">
+        <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Batal</button>
+        <button type="submit" id="saveBtn" class="px-4 py-2 bg-[#EDBB00] text-[#004D98] rounded-lg font-semibold hover:bg-[#DAA520]">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+<script src="{% static 'js/toast.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const productList = document.getElementById('productList');
+  const form = document.getElementById('productForm');
+  const modal = document.getElementById('productModal');
+  const addBtn = document.getElementById('btnAdd');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const refreshBtn = document.getElementById('btnRefresh');
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  function showModal() { modal.classList.remove('hidden'); }
+  function hideModal() { 
+    modal.classList.add('hidden'); 
+    form.reset(); 
+    document.getElementById('productId').value = '';
+    document.getElementById('modalTitle').textContent = 'Tambah Produk';
+  }
+
+  async function fetchProducts() {
+    productList.innerHTML = '<p id="loadingState" class="col-span-full text-center text-gray-400">Loading products...</p>';
+    try {
+      const res = await fetch("{% url 'main:show_json' %}");
+      const data = await res.json(); // Data di sini adalah array langsung, bukan { fields: ..., pk: ... }
+      renderProducts(data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      productList.innerHTML = '<p class="col-span-full text-center text-red-500">Error loading products</p>';
+    }
+  }
+
+  function renderProducts(products) {
+    productList.innerHTML = '';
+    if (products.length === 0) {
+      productList.innerHTML = '<p class="col-span-full text-center text-gray-500">No products yet.</p>';
+      return;
+    }
+
+    products.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex flex-col';
+      card.innerHTML = `
+        <img src="${p.thumbnail || 'https://via.placeholder.com/300x200'}" alt="${p.name}" class="h-48 w-full object-cover">
         <div class="p-4 flex flex-col flex-grow">
-          <h3 class="text-lg font-bold text-gray-800 mb-1">{{ product.name }}</h3>
-          <p class="text-[#DAA520] font-semibold mb-2">Rp {{ product.price }}</p>
-          <p class="text-gray-600 text-sm flex-grow">{{ product.description }}</p>
-
-          <div class="mt-4 flex flex-wrap gap-2">
-            <a href="{% url 'main:product_detail' product.id %}" 
-               class="inline-block text-center px-3 py-2 bg-[#004D98] text-white rounded-lg font-semibold hover:bg-[#003366] transition">
-               Detail
-            </a>
-
-            {% if filter_type == 'my' %}
-            <a href="{% url 'main:edit_product' product.id %}" 
-               class="inline-block text-center px-3 py-2 bg-[#EDBB00] text-[#004D98] rounded-lg font-semibold hover:bg-[#DAA520] transition">
-               Edit
-            </a>
-            <a href="{% url 'main:delete_product' product.id %}" 
-               class="inline-block text-center px-3 py-2 bg-[#A50044] text-white rounded-lg font-semibold hover:bg-[#800033] transition"
-               onclick="return confirm('Yakin mau hapus produk ini?');">
-               Delete
-            </a>
-            {% endif %}
+          <h3 class="text-lg font-bold mb-1">${p.name}</h3>
+          <p class="text-gray-600 text-sm flex-grow">${p.description || 'No description'}</p>
+          <p class="text-[#004D98] font-semibold mt-2">Rp${p.price}</p>
+          <div class="mt-3 flex justify-between items-center">
+            <button class="detail-btn px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600" data-id="${p.id}">Detail</button>
+            <button class="edit-btn px-3 py-1 bg-yellow-400 text-[#004D98] rounded-lg text-sm hover:bg-yellow-500" data-id="${p.id}">Edit</button>
+            <button class="delete-btn px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600" data-id="${p.id}">Hapus</button>
           </div>
         </div>
-      </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  <div class="bg-white rounded-lg p-8 text-center shadow-md">
-    <img src="{% static 'image/no_product.png' %}" alt="Belum ada produk" class="w-28 mx-auto mb-4">
-    <p class="text-gray-600 mb-4">Belum ada produk. Yuk tambahkan produk pertamamu!</p>
-    <a href="{% url 'main:create_product' %}" class="inline-block px-4 py-2 bg-[#A50044] text-white rounded-lg font-semibold hover:bg-[#800033] transition">
-      Tambah Product
-    </a>
-  </div>
-  {% endif %}
+      `;
+      productList.appendChild(card);
+    });
 
-</div>
+    // Tombol detail
+    document.querySelectorAll('.detail-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        window.location.href = `/product/detail/${id}/`; // Menggunakan URL UUID
+      });
+    });
+
+    // Hapus Produk
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id; // Ini adalah UUID sebagai string
+        if (!confirm('Yakin mau hapus produk ini?')) return;
+        
+        try {
+          const res = await fetch(`/product/${id}/delete`, { // Tanpa trailing slash, sesuai urls.py
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken },
+          });
+          const result = await res.json();
+          if (result.success) {
+            showToast('Produk berhasil dihapus!', 'success');
+            fetchProducts();
+          } else {
+            showToast('Gagal menghapus produk: ' + (result.message || ''), 'error');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Terjadi kesalahan saat menghapus', 'error');
+        }
+      });
+    });
+
+    // Edit Produk
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id; // Ini adalah UUID sebagai string
+        
+        try {
+          // Menggunakan show_json_by_id untuk mengambil detail produk
+          const res = await fetch(`/json/${id}/`); 
+          if (!res.ok) {
+            throw new Error('Failed to fetch product data');
+          }
+          
+          const product = await res.json(); // Ini adalah objek langsung, bukan { fields: ..., pk: ... }
+          
+          document.getElementById('modalTitle').textContent = 'Edit Produk';
+          document.getElementById('productId').value = product.id; // UUID sebagai string
+          document.getElementById('productName').value = product.name || '';
+          document.getElementById('productPrice').value = product.price || '';
+          document.getElementById('productDesc').value = product.description || '';
+          document.getElementById('productThumb').value = product.thumbnail || '';
+          document.getElementById('productCategory').value = product.category || 'others';
+          document.getElementById('productFeatured').checked = product.is_featured || false;
+          
+          showModal();
+        } catch (error) {
+          console.error('Error fetching product for edit:', error);
+          showToast('Gagal memuat data produk untuk diedit', 'error');
+        }
+      });
+    });
+  }
+
+  // Tambah/Edit Produk
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const formData = new FormData(form);
+  const id = document.getElementById('productId').value; // Ini akan menjadi UUID atau kosong
+  
+  // Tambahkan CSRF token ke FormData
+  formData.append('csrfmiddlewaretoken', csrftoken);
+
+  // Perbaiki nilai checkbox untuk is_featured jika tidak dicentang
+  if (!formData.get('is_featured')) {
+      formData.set('is_featured', ''); // Kirim string kosong atau 'off' jika checkbox tidak dicentang
+  }
+  
+  try {
+    let url;
+    if (id) {
+      url = `/product/${id}/edit`; // Tanpa trailing slash, sesuai urls.py
+    } else {
+      url = "{% url 'main:create_product' %}"; // URL sudah benar: products/create/
+    }
+    
+    console.log('Submitting to:', url);
+    console.log('Product ID:', id); // Akan kosong untuk add, atau UUID untuk edit
+    
+    const res = await fetch(url, { 
+      method: 'POST', 
+      body: formData 
+    });
+    
+    const data = await res.json();
+    console.log('Response data:', data);
+    
+    if (data.success) {
+      showToast(data.message || 'Produk berhasil disimpan!', 'success');
+      hideModal();
+      fetchProducts();
+    } else {
+      // Periksa apakah data.errors ada dan itu objek
+      let errorMsg = 'Gagal menyimpan produk: ';
+      if (data.errors && typeof data.errors === 'object') {
+          // Gabungkan pesan error dari setiap field
+          errorMsg += Object.entries(data.errors)
+                             .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+                             .join('; ');
+      } else if (data.message) {
+          errorMsg += data.message;
+      } else {
+          errorMsg += 'Unknown error.';
+      }
+      showToast(errorMsg, 'error');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('Terjadi kesalahan saat menyimpan', 'error');
+  }
+});
+
+  addBtn.addEventListener('click', () => {
+    hideModal(); // Reset form dan ID sebelum membuka modal
+    document.getElementById('modalTitle').textContent = 'Tambah Produk';
+    showModal();
+  });
+  
+  cancelBtn.addEventListener('click', hideModal);
+  refreshBtn.addEventListener('click', fetchProducts);
+
+  fetchProducts();
+});
+</script>
 {% endblock %}

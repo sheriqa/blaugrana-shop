@@ -1,0 +1,111 @@
+<!-- Modal Create/Update Product -->
+<div id="productModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50">
+    <div id="productModalContent" class="bg-white rounded-lg shadow-lg w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3 max-h-screen overflow-y-auto">
+      
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-4 border-b">
+        <div>
+          <h3 id="productModalTitle" class="text-xl font-semibold text-gray-900">
+            Create New Product
+          </h3>
+          <p class="text-sm text-gray-600 mt-1">Add a new product to your shop</p>
+        </div>
+        <button type="button" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" onclick="hideProductModal()">
+          ✕
+        </button>
+      </div>
+  
+      <!-- Modal body -->
+      <div class="px-6 py-4 space-y-6 form-style">
+        <form id="productForm">
+          <div class="mb-4">
+            <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
+            <input type="text" id="name" name="name" class="mt-1 block w-full border rounded-md px-3 py-2" placeholder="Enter product name" required>
+          </div>
+          <div class="mb-4">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea id="description" name="description" rows="3" class="mt-1 block w-full border rounded-md px-3 py-2" placeholder="Enter product description" required></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+            <input type="number" id="price" name="price" class="mt-1 block w-full border rounded-md px-3 py-2" placeholder="Enter product price" required>
+          </div>
+          <div class="mb-4">
+            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+            <select id="category" name="category" class="mt-1 block w-full border rounded-md px-3 py-2" required>
+              <option value="">Choose category</option>
+              <option value="jersey">Jersey</option>
+              <option value="shoes">Shoes</option>
+              <option value="accessories">Accessories</option>
+              <option value="ball">Ball</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="thumbnail" class="block text-sm font-medium text-gray-700">Thumbnail URL</label>
+            <input type="url" id="thumbnail" name="thumbnail" class="mt-1 block w-full border rounded-md px-3 py-2" placeholder="https://example.com/image.jpg">
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center">
+              <input id="is_featured" name="is_featured" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded">
+              <label for="is_featured" class="ml-2 text-sm font-medium text-gray-900">Featured Product</label>
+            </div>
+          </div>
+        </form>
+      </div>
+  
+      <!-- Modal footer -->
+      <div class="flex flex-col sm:flex-row gap-4 p-6 border-t border-gray-200 rounded-b">
+        <button type="button" id="cancelProductBtn" class="px-6 py-3 border rounded-md text-gray-700 hover:bg-gray-50" onclick="hideProductModal()">Cancel</button>
+        <button type="submit" id="submitProductBtn" form="productForm" class="flex-1 bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700">Save Product</button>
+      </div>
+  
+    </div>
+  </div>
+  
+  <script>
+    function showProductModal() {
+        const modal = document.getElementById('productModal');
+        const modalContent = document.getElementById('productModalContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modalContent.classList.remove('opacity-0', 'scale-95');
+            modalContent.classList.add('opacity-100', 'scale-100');
+        }, 50);
+    }
+  
+    function hideProductModal() {
+        const modal = document.getElementById('productModal');
+        const modalContent = document.getElementById('productModalContent');
+        modalContent.classList.remove('opacity-100', 'scale-100');
+        modalContent.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 150);
+    }
+  
+    async function addProduct() {
+        const form = document.getElementById('productForm');
+        const data = new FormData(form);
+  
+        const response = await fetch("{% url 'main:create_product_ajax' %}", {
+            method: "POST",
+            body: data,
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        });
+  
+        const result = await response.json();
+        if(result.success){
+            form.reset();
+            hideProductModal();
+            showToast('Product added successfully!', '', 'success');
+            document.dispatchEvent(new CustomEvent('productAdded', {detail: result.product}));
+        } else {
+            showToast('Error adding product!', JSON.stringify(result.errors), 'error');
+        }
+    }
+  
+    document.getElementById('productForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        addProduct();
+    });
+  </script>
+  

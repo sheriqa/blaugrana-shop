@@ -6,7 +6,6 @@ class Product(models.Model):
     CATEGORY_CHOICES = [
         ('jersey', 'Jersey'),
         ('shoes', 'Shoes'),
-        #tes
         ('accessories', 'Accessories'),
         ('ball', 'Ball'),
         ('others', 'Others'),
@@ -38,4 +37,23 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         return self.product.price * self.quantity
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     

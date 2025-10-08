@@ -6,7 +6,7 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = "__all__"
+        fields = ['name', 'description', 'price', 'category', 'thumbnail', 'stock', 'is_featured']
 
 class RegisterForm(UserCreationForm):
     class Meta:
